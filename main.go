@@ -23,9 +23,8 @@ func main() {
 		}),
 	}
 
-
-
 	app := &cli.App{
+		EnableBashCompletion: true,
 		Before: altsrc.InitInputSourceWithContext(flags, func(context *cli.Context) (altsrc.InputSourceContext, error) {
 			source, err := altsrc.NewTomlSourceFromFile("/Users/zklapow/.sng/config.toml")
 			if err != nil {
@@ -39,9 +38,11 @@ func main() {
 
 		Commands: []*cli.Command{
 			{
+				Category: "requests",
 				Name: "list",
 				Aliases: []string{"l"},
 				Usage: "list all requests",
+				ArgsUsage: "[request]",
 				Action: func(c *cli.Context) error {
 					commands.ListAllRequests(conf.getClient())
 					return nil
