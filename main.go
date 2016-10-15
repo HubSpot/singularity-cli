@@ -44,6 +44,11 @@ func main() {
 				Usage: "list all requests",
 				ArgsUsage: "[request]",
 				Action: func(c *cli.Context) error {
+					if c.Args().Get(0) != "" {
+						commands.FindRequestsMatching(conf.getClient(), c.Args().Get(0))
+						return nil
+					}
+
 					commands.ListAllRequests(conf.getClient())
 					return nil
 				},
