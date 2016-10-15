@@ -16,12 +16,12 @@ func RenderRequestTable(reqs []models.RequestParent) {
 
 	table.SetHeader([]string{"Request ID", "Status"})
 	table.SetBorder(false)
-	table.AppendBulk(requestTotStringArray(reqs))
+	table.AppendBulk(requestToStringArray(reqs))
 
 	table.Render()
 }
 
-func requestTotStringArray(reqs []models.RequestParent) [][]string {
+func requestToStringArray(reqs []models.RequestParent) [][]string {
 	result := make([][]string, len(reqs))
 
 	for i, req := range reqs {
