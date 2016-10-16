@@ -35,12 +35,12 @@ func FindRequestsMatching(client *client.SingularityClient, query string) {
 	ui.RenderRequestTable(suggested)
 }
 
-func indexRequestsById(reqs []models.RequestParent) map[string]models.RequestParent {
-	result := map[string]models.RequestParent{}
-
-	for _, req := range reqs {
-		result[req.Request.Id] = req
+func ShowRequestDetails(client *client.SingularityClient, requestId string) {
+	tasks, err := client.GetActiveTasksFor(requestId)
+	if err != nil {
+		fmt.Printf("Could not load request from singularity: %#v", err)
+		panic(err)
 	}
 
-	return result
+	ui.RenderActiveTasksTable(tasks)
 }

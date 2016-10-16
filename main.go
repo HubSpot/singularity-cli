@@ -53,6 +53,16 @@ func main() {
 					return nil
 				},
 			},
+			{
+				Category:  "requests",
+				Name:      "show",
+				Usage:     "show details of a request",
+				ArgsUsage: "[request]",
+				Action: func(c *cli.Context) error {
+					commands.ShowRequestDetails(conf.getClient(), c.Args().Get(0))
+					return nil
+				},
+			},
 		},
 	}
 

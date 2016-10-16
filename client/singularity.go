@@ -9,7 +9,9 @@ import (
 )
 
 const (
-	api_list_requests = "/api/requests"
+	api_list_requests            = "/api/requests"
+	api_get_request              = "/api/requests/%v"
+	api_active_tasks_for_request = "/api/history/request/%v/tasks/active"
 )
 
 type SingularityClient struct {
@@ -48,8 +50,55 @@ func (c *SingularityClient) ListAllRequests() ([]models.RequestParent, error) {
 	return res, err
 }
 
+func (c *SingularityClient) GetRequest(requestId string) (*models.RequestParent, error) {
+	req, err := c.requestFor(api_get_request, requestId)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &models.RequestParent{}
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, err
+}
+
+func (c *SingularityClient) GetActiveTasksFor(requestId string) ([]models.SingularityTaskIdHistory, error) {
+	req, err := c.requestFor(api_active_tasks_for_request, requestId)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]models.SingularityTaskIdHistory, 0)
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, err
+}
+
 func (c *SingularityClient) requestFor(path string, a ...interface{}) (*http.Request, error) {
-	url := c.urlFor(api_list_requests)
+	url := c.urlFor(path, a...)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
