@@ -127,6 +127,23 @@ func main() {
 				},
 				BashComplete: completeFromCachedRequestList(&conf),
 			},
+			{
+				Category:  "files",
+				Name:      "files",
+				Usage:     "commands to manipulate files in a task sandbox",
+				ArgsUsage: "action",
+				Subcommands: []*cli.Command{
+					{
+						Name:      "ls",
+						Usage:     "List files in this tasks sandbox",
+						ArgsUsage: "taskId [path]",
+						Action: func(c *cli.Context) error {
+
+							return nil
+						},
+					},
+				},
+			},
 		},
 	}
 
