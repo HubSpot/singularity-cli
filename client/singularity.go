@@ -1,7 +1,9 @@
 package client
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"git.hubteam.com/zklapow/singularity-cli/models"
 	"io/ioutil"
@@ -13,6 +15,7 @@ const (
 	api_get_request              = "/api/requests/%v"
 	api_pause_request            = "/api/requests/request/%v/pause"
 	api_unpause_request          = "/api/requests/request/%v/unpause"
+	api_scale_request            = "/api/requests/request/%v/scale"
 	api_active_tasks_for_request = "/api/history/request/%v/tasks/active"
 )
 
@@ -102,6 +105,47 @@ func (c *SingularityClient) GetActiveTasksFor(requestId string) ([]models.Singul
 	return res, err
 }
 
+func (c *SingularityClient) ScaleRequest(requestId string, numInstances int) (*models.RequestParent, error) {
+	scaleRequest := models.SingularityScaleRequest{
+		Instances: numInstances,
+	}
+
+	data, err := json.Marshal(scaleRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", c.urlFor(api_scale_request, requestId), bytes.NewBuffer(data))
+	if err != nil {
+		return nil, err
+	}
+
+	c.setStandardRequestsHeaders(req)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode == http.StatusBadRequest {
+		return nil, errors.New("Scaled number of instances must not match the current number of instances.")
+	}
+
+	data, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &models.RequestParent{}
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
 func (c *SingularityClient) PauseRequest(requestId string) (*models.RequestParent, error) {
 	return c.pauseInternal(api_pause_request, requestId)
 }
@@ -143,11 +187,15 @@ func (c *SingularityClient) requestFor(path string, a ...interface{}) (*http.Req
 		return nil, err
 	}
 
+	c.setStandardRequestsHeaders(req)
+
+	return req, nil
+}
+
+func (c *SingularityClient) setStandardRequestsHeaders(req *http.Request) {
 	for k, v := range c.headers {
 		req.Header.Add(k, v)
 	}
-
-	return req, nil
 }
 
 func (c *SingularityClient) urlFor(path string, a ...interface{}) string {

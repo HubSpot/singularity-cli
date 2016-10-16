@@ -64,3 +64,13 @@ func UnPauseRequest(client *client.SingularityClient, requestId string) {
 
 	ui.RenderRequest(*request)
 }
+
+func ScaleRequest(client *client.SingularityClient, requestId string, numInstances int) {
+	_, err := client.ScaleRequest(requestId, numInstances)
+	if err != nil {
+		fmt.Printf("Could not scale %v to %v instances: %#v", requestId, numInstances, err)
+		panic(err)
+	}
+
+	ShowRequestDetails(client, requestId)
+}

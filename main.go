@@ -1,12 +1,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"git.hubteam.com/zklapow/singularity-cli/client"
 	"git.hubteam.com/zklapow/singularity-cli/commands"
 	"gopkg.in/urfave/cli.v2"
 	"gopkg.in/urfave/cli.v2/altsrc"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -69,7 +71,14 @@ func main() {
 				Category:  "requests",
 				Name:      "pause",
 				Usage:     "pause a request",
-				ArgsUsage: "[request]",
+				ArgsUsage: "request",
+				Before: func(c *cli.Context) error {
+					if c.Args().Get(0) == "" {
+						return errors.New("Error: Must specify a request to pause")
+					}
+
+					return nil
+				},
 				Action: func(c *cli.Context) error {
 					commands.PauseRequest(conf.getClient(), c.Args().Get(0))
 					return nil
@@ -80,9 +89,40 @@ func main() {
 				Category:  "requests",
 				Name:      "unpause",
 				Usage:     "unpause a request",
-				ArgsUsage: "[request]",
+				ArgsUsage: "request",
+				Before: func(c *cli.Context) error {
+					if c.Args().Get(0) == "" {
+						return errors.New("Error: Must specify a request to un-pause")
+					}
+
+					return nil
+				},
 				Action: func(c *cli.Context) error {
 					commands.UnPauseRequest(conf.getClient(), c.Args().Get(0))
+					return nil
+				},
+				BashComplete: completeFromCachedRequestList(&conf),
+			},
+			{
+				Category:  "requests",
+				Name:      "scale",
+				Usage:     "scale a request",
+				ArgsUsage: "request instanceCount",
+				Before: func(c *cli.Context) error {
+					if c.Args().Get(0) == "" || c.Args().Get(1) == "" {
+						return errors.New("Error: Please specify a request to scale and instance count to scale to")
+					}
+
+					if _, err := strconv.Atoi(c.Args().Get(1)); err != nil {
+						return errors.New("Error: Instance count must be a number")
+					}
+
+					return nil
+				},
+				Action: func(c *cli.Context) error {
+					instanceCount, _ := strconv.Atoi(c.Args().Get(1))
+
+					commands.ScaleRequest(conf.getClient(), c.Args().Get(0), instanceCount)
 					return nil
 				},
 				BashComplete: completeFromCachedRequestList(&conf),
