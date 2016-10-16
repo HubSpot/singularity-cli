@@ -47,6 +47,9 @@ func (c *SingularityClient) ListAllRequests() ([]models.RequestParent, error) {
 		}
 	}
 
+	// Always cache the requests after we load the whole lists
+	c.cacheRequestList(res)
+
 	return res, err
 }
 
