@@ -11,6 +11,8 @@ import (
 const (
 	api_list_requests            = "/api/requests"
 	api_get_request              = "/api/requests/%v"
+	api_pause_request            = "/api/requests/request/%v/pause"
+	api_unpause_request          = "/api/requests/request/%v/unpause"
 	api_active_tasks_for_request = "/api/history/request/%v/tasks/active"
 )
 
@@ -98,6 +100,40 @@ func (c *SingularityClient) GetActiveTasksFor(requestId string) ([]models.Singul
 	}
 
 	return res, err
+}
+
+func (c *SingularityClient) PauseRequest(requestId string) (*models.RequestParent, error) {
+	return c.pauseInternal(api_pause_request, requestId)
+}
+
+func (c *SingularityClient) UnPauseRequest(requestId string) (*models.RequestParent, error) {
+	return c.pauseInternal(api_unpause_request, requestId)
+}
+
+func (c *SingularityClient) pauseInternal(path, requestId string) (*models.RequestParent, error) {
+	req, err := c.requestFor(path, requestId)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Method = "POST"
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &models.RequestParent{}
+	err = json.Unmarshal(data, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 func (c *SingularityClient) requestFor(path string, a ...interface{}) (*http.Request, error) {

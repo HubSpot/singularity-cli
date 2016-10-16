@@ -13,6 +13,10 @@ var red func(...interface{}) string = color.New(color.FgHiRed).SprintFunc()
 var green func(...interface{}) string = color.New(color.FgGreen).SprintFunc()
 var blue func(...interface{}) string = color.New(color.FgBlue).SprintFunc()
 
+func RenderRequest(req models.RequestParent) {
+	RenderRequestTable([]models.RequestParent{req})
+}
+
 func RenderRequestTable(reqs []models.RequestParent) {
 	table := tablewriter.NewWriter(os.Stdout)
 

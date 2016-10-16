@@ -44,3 +44,23 @@ func ShowRequestDetails(client *client.SingularityClient, requestId string) {
 
 	ui.RenderActiveTasksTable(tasks)
 }
+
+func PauseRequest(client *client.SingularityClient, requestId string) {
+	request, err := client.PauseRequest(requestId)
+	if err != nil {
+		fmt.Printf("Could not pause %v: %#v", requestId, err)
+		panic(err)
+	}
+
+	ui.RenderRequest(*request)
+}
+
+func UnPauseRequest(client *client.SingularityClient, requestId string) {
+	request, err := client.UnPauseRequest(requestId)
+	if err != nil {
+		fmt.Printf("Could not unpause %v: %#v", requestId, err)
+		panic(err)
+	}
+
+	ui.RenderRequest(*request)
+}

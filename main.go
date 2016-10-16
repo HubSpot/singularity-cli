@@ -65,6 +65,28 @@ func main() {
 				},
 				BashComplete: completeFromCachedRequestList(&conf),
 			},
+			{
+				Category:  "requests",
+				Name:      "pause",
+				Usage:     "pause a request",
+				ArgsUsage: "[request]",
+				Action: func(c *cli.Context) error {
+					commands.PauseRequest(conf.getClient(), c.Args().Get(0))
+					return nil
+				},
+				BashComplete: completeFromCachedRequestList(&conf),
+			},
+			{
+				Category:  "requests",
+				Name:      "unpause",
+				Usage:     "unpause a request",
+				ArgsUsage: "[request]",
+				Action: func(c *cli.Context) error {
+					commands.UnPauseRequest(conf.getClient(), c.Args().Get(0))
+					return nil
+				},
+				BashComplete: completeFromCachedRequestList(&conf),
+			},
 		},
 	}
 
