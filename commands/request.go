@@ -83,9 +83,9 @@ func BrowseSandbox(client *client.SingularityClient, requestId string, instance 
 	}
 
 	var task *models.SingularityTaskId
-	for _, t := range tasks {
+	for i, t := range tasks {
 		if t.TaskId.InstanceNo == instance {
-			task = &t.TaskId
+			task = &tasks[i].TaskId
 		}
 	}
 

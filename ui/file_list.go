@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"fmt"
 	"git.hubteam.com/zklapow/singularity-cli/models"
 	"github.com/olekukonko/tablewriter"
 	"os"
@@ -9,6 +10,8 @@ import (
 )
 
 func RenderSandboxFileList(sandbox models.SingularitySandbox) {
+	fmt.Println(sandbox.SlaveHostname)
+
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeaderLine(false)
 	table.SetBorder(false)

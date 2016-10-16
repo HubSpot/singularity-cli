@@ -132,6 +132,9 @@ func main() {
 				Name:      "files",
 				Usage:     "commands to manipulate files in a task sandbox",
 				ArgsUsage: "action",
+				BashComplete: func(c *cli.Context) {
+					fmt.Println("ls")
+				},
 				Subcommands: []*cli.Command{
 					{
 						Flags: []cli.Flag{
@@ -140,6 +143,7 @@ func main() {
 								Aliases: []string{"i"},
 								Value:   1,
 								Usage:   "Browse sandbox of `INSTANCE`",
+								Destination: &conf.InstanceNum,
 							},
 						},
 						Name:      "ls",
@@ -152,7 +156,7 @@ func main() {
 							return nil
 						},
 						Action: func(c *cli.Context) error {
-							commands.BrowseSandbox(conf.getClient(), c.Args().Get(0), c.Int("instance"))
+							commands.BrowseSandbox(conf.getClient(), c.Args().Get(0), conf.InstanceNum)
 							return nil
 						},
 						BashComplete: completeFromCachedRequestList(&conf),
@@ -166,8 +170,9 @@ func main() {
 }
 
 type Config struct {
-	BaseUri string
-	User    string
+	BaseUri     string
+	User        string
+	InstanceNum int
 }
 
 func (c *Config) getClient() *client.SingularityClient {
