@@ -5,12 +5,11 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 	"git.hubteam.com/zklapow/singularity-cli/models"
+	"github.com/mitchellh/go-homedir"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
-	"fmt"
-	"github.com/mitchellh/go-homedir"
 )
 
 func (c *SingularityClient) GetCachedRequestList() ([]string, error) {

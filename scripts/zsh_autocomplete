@@ -1,0 +1,12 @@
+#compdef singularity-cli 
+
+script_dir=${0:a:h}
+
+_sng() {
+  autoload -U compinit && compinit
+  autoload -U bashcompinit && bashcompinit
+
+  source ${script_dir}/bash_autocomplete
+}
+
+_sng
