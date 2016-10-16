@@ -1,15 +1,16 @@
 package client
 
 import (
-	"io/ioutil"
-	"path/filepath"
+	"bytes"
 	"crypto/md5"
 	"encoding/base64"
-	"fmt"
-	"os"
-	"strings"
 	"git.hubteam.com/zklapow/singularity-cli/models"
-	"bytes"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
+	"fmt"
+	"github.com/mitchellh/go-homedir"
 )
 
 func (c *SingularityClient) GetCachedRequestList() ([]string, error) {
@@ -42,13 +43,17 @@ func (c *SingularityClient) cacheRequestList(requests []models.RequestParent) er
 		buffer.WriteString(req.Request.Id + "\n")
 	}
 
-	return ioutil.WriteFile(tmpfp, buffer.Bytes(), os.ModeTemporary | os.ModePerm)
+	return ioutil.WriteFile(tmpfp, buffer.Bytes(), os.ModeTemporary|os.ModePerm)
 }
 
 func (c *SingularityClient) getCacheFilePath() (string, error) {
-	dir, err := ioutil.TempDir("", "sng")
+	dir, err := homedir.Expand("~/.sng_cache")
 	if err != nil {
 		return "", err
+	}
+
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		os.Mkdir(dir, os.ModePerm)
 	}
 
 	hasher := md5.New()

@@ -55,7 +55,7 @@ func taskToStrings(task models.SingularityTaskIdHistory) []string {
 		break
 	}
 
-	humanReadableStartTime, err := time.Unix(task.TaskId.StartedAt / 1000, 0).MarshalText()
+	humanReadableStartTime, err := time.Unix(task.TaskId.StartedAt/1000, 0).MarshalText()
 	if err != nil {
 		humanReadableStartTime = []byte("UNKNOWN")
 	}

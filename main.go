@@ -52,6 +52,7 @@ func main() {
 					commands.ListAllRequests(conf.getClient())
 					return nil
 				},
+				BashComplete: completeFromCachedRequestList(&conf),
 			},
 			{
 				Category:  "requests",
@@ -62,6 +63,7 @@ func main() {
 					commands.ShowRequestDetails(conf.getClient(), c.Args().Get(0))
 					return nil
 				},
+				BashComplete: completeFromCachedRequestList(&conf),
 			},
 		},
 	}
@@ -76,4 +78,19 @@ type Config struct {
 
 func (c *Config) getClient() *client.SingularityClient {
 	return client.NewSingularityClient(c.BaseUri, map[string]string{"X-HubSpot-User": c.User})
+}
+
+func completeFromCachedRequestList(conf *Config) cli.BashCompleteFunc {
+	return func(c *cli.Context) {
+		requests, err := conf.getClient().GetCachedRequestList()
+		if err != nil {
+			return
+		}
+
+		for _, req := range requests {
+			fmt.Println(req)
+		}
+
+		return
+	}
 }
