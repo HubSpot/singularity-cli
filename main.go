@@ -134,13 +134,28 @@ func main() {
 				ArgsUsage: "action",
 				Subcommands: []*cli.Command{
 					{
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:    "instance",
+								Aliases: []string{"i"},
+								Value:   1,
+								Usage:   "Browse sandbox of `INSTANCE`",
+							},
+						},
 						Name:      "ls",
 						Usage:     "List files in this tasks sandbox",
 						ArgsUsage: "taskId [path]",
-						Action: func(c *cli.Context) error {
-
+						Before: func(c *cli.Context) error {
+							if c.Args().Get(0) == "" {
+								return errors.New("Error: Must specify a task to browse")
+							}
 							return nil
 						},
+						Action: func(c *cli.Context) error {
+							commands.BrowseSandbox(conf.getClient(), c.Args().Get(0), c.Int("instance"))
+							return nil
+						},
+						BashComplete: completeFromCachedRequestList(&conf),
 					},
 				},
 			},

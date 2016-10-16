@@ -2,17 +2,10 @@ package ui
 
 import (
 	"git.hubteam.com/zklapow/singularity-cli/models"
-	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
 	"os"
 	"strconv"
-	"time"
 )
-
-var red func(...interface{}) string = color.New(color.FgHiRed).SprintFunc()
-var green func(...interface{}) string = color.New(color.FgGreen).SprintFunc()
-var blue func(...interface{}) string = color.New(color.FgBlue).SprintFunc()
-var yellow func(...interface{}) string = color.New(color.FgYellow).SprintFunc()
 
 func RenderRequest(req models.RequestParent) {
 	RenderRequestTable([]models.RequestParent{req})
@@ -66,12 +59,12 @@ func taskToStrings(task models.SingularityTaskIdHistory) []string {
 		state = task.LastTaskState
 	}
 
-	humanReadableStartTime, err := time.Unix(task.TaskId.StartedAt/1000, 0).MarshalText()
-	if err != nil {
-		humanReadableStartTime = []byte("UNKNOWN")
+	return []string{
+		strconv.Itoa(task.TaskId.InstanceNo),
+		task.TaskId.Host,
+		unixMsToHumanTime(task.TaskId.StartedAt),
+		state,
 	}
-
-	return []string{strconv.Itoa(task.TaskId.InstanceNo), task.TaskId.Host, string(humanReadableStartTime), state}
 }
 
 func requestToStringArray(reqs []models.RequestParent) [][]string {

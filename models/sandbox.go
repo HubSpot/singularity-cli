@@ -10,6 +10,6 @@ type SingularitySandbox struct {
 type SingularitySandboxFile struct {
 	Size  uint64 `json:"size"`
 	Mode  string `json:"mode"`
-	Mtime uint64 `json:"mtime"`
+	Mtime int64  `json:"mtime"`
 	Name  string `json:"name"`
 }

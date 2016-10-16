@@ -128,4 +128,3 @@ func (c *SingularityClient) pauseInternal(path, requestId string) (*models.Reque
 
 	return res, nil
 }
-

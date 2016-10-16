@@ -74,3 +74,31 @@ func ScaleRequest(client *client.SingularityClient, requestId string, numInstanc
 
 	ShowRequestDetails(client, requestId)
 }
+
+func BrowseSandbox(client *client.SingularityClient, requestId string, instance int) {
+	tasks, err := client.GetActiveTasksFor(requestId)
+	if err != nil {
+		fmt.Printf("Could not load tasks for request %v: %#v", requestId, err)
+		panic(err)
+	}
+
+	var task *models.SingularityTaskId
+	for _, t := range tasks {
+		if t.TaskId.InstanceNo == instance {
+			task = &t.TaskId
+		}
+	}
+
+	if task == nil {
+		fmt.Printf("Could not find task with ID %v for request %v", instance, requestId)
+		return
+	}
+
+	sandbox, err := client.BrowseSandbox(task.Id)
+	if err != nil {
+		fmt.Printf("Could not browse sandbox of task %v: %#v", task.Id, err)
+		panic(err)
+	}
+
+	ui.RenderSandboxFileList(*sandbox)
+}

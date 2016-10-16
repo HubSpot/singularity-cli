@@ -1,13 +1,13 @@
 package client
 
 import (
-	"io/ioutil"
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 )
 
-func (c *SingularityClient) getJson(result interface{}, path string, args... interface{}) error {
+func (c *SingularityClient) getJson(result interface{}, path string, args ...interface{}) error {
 	req, err := c.requestFor(path, args...)
 	if err != nil {
 		return err
