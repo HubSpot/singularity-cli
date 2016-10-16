@@ -12,6 +12,7 @@ import (
 var red func(...interface{}) string = color.New(color.FgHiRed).SprintFunc()
 var green func(...interface{}) string = color.New(color.FgGreen).SprintFunc()
 var blue func(...interface{}) string = color.New(color.FgBlue).SprintFunc()
+var yellow func(...interface{}) string = color.New(color.FgYellow).SprintFunc()
 
 func RenderRequest(req models.RequestParent) {
 	RenderRequestTable([]models.RequestParent{req})
@@ -57,6 +58,10 @@ func taskToStrings(task models.SingularityTaskIdHistory) []string {
 		state = red(task.LastTaskState)
 	case "TASK_LAUNCHED":
 		state = blue(task.LastTaskState)
+	case "TASK_CLEANING":
+		state = yellow(task.LastTaskState)
+	case "TASK_STARTING":
+		state = yellow(task.LastTaskState)
 	default:
 		state = task.LastTaskState
 	}
