@@ -2,9 +2,9 @@ package ui
 
 import (
 	"git.hubteam.com/zklapow/singularity-cli/models"
+	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
 	"os"
-	"github.com/fatih/color"
 )
 
 var red func(...interface{}) string = color.New(color.FgHiRed).SprintFunc()

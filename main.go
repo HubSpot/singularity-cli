@@ -1,12 +1,12 @@
 package main
 
 import (
+	"fmt"
+	"git.hubteam.com/zklapow/singularity-cli/client"
+	"git.hubteam.com/zklapow/singularity-cli/commands"
 	"gopkg.in/urfave/cli.v2"
 	"gopkg.in/urfave/cli.v2/altsrc"
-	"git.hubteam.com/zklapow/singularity-cli/commands"
-	"git.hubteam.com/zklapow/singularity-cli/client"
 	"os"
-	"fmt"
 )
 
 func main() {
@@ -14,11 +14,11 @@ func main() {
 
 	flags := []cli.Flag{
 		altsrc.NewStringFlag(&cli.StringFlag{
-			Name: "base-uri",
+			Name:        "base-uri",
 			Destination: &conf.BaseUri,
 		}),
 		altsrc.NewStringFlag(&cli.StringFlag{
-			Name: "user",
+			Name:        "user",
 			Destination: &conf.User,
 		}),
 	}
@@ -38,10 +38,10 @@ func main() {
 
 		Commands: []*cli.Command{
 			{
-				Category: "requests",
-				Name: "list",
-				Aliases: []string{"l"},
-				Usage: "list all requests",
+				Category:  "requests",
+				Name:      "list",
+				Aliases:   []string{"ls"},
+				Usage:     "list all requests",
 				ArgsUsage: "[request]",
 				Action: func(c *cli.Context) error {
 					if c.Args().Get(0) != "" {
@@ -61,9 +61,9 @@ func main() {
 
 type Config struct {
 	BaseUri string
-	User string
+	User    string
 }
 
-func (c *Config) getClient() (*client.SingularityClient)  {
+func (c *Config) getClient() *client.SingularityClient {
 	return client.NewSingularityClient(c.BaseUri, map[string]string{"X-HubSpot-User": c.User})
 }

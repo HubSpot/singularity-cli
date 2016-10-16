@@ -1,10 +1,10 @@
 package commands
 
 import (
-	"git.hubteam.com/zklapow/singularity-cli/client"
-	"git.hubteam.com/zklapow/singularity-cli/ui"
 	"fmt"
+	"git.hubteam.com/zklapow/singularity-cli/client"
 	"git.hubteam.com/zklapow/singularity-cli/models"
+	"git.hubteam.com/zklapow/singularity-cli/ui"
 	"strings"
 )
 

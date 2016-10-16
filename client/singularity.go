@@ -1,11 +1,11 @@
 package client
 
 import (
-	"net/http"
-	"fmt"
 	"encoding/json"
-	"io/ioutil"
+	"fmt"
 	"git.hubteam.com/zklapow/singularity-cli/models"
+	"io/ioutil"
+	"net/http"
 )
 
 const (
@@ -13,8 +13,8 @@ const (
 )
 
 type SingularityClient struct {
-	baseUri string
-	headers map[string]string
+	baseUri    string
+	headers    map[string]string
 	httpClient *http.Client
 }
 
@@ -40,7 +40,7 @@ func (c *SingularityClient) ListAllRequests() ([]models.RequestParent, error) {
 	if err != nil {
 		switch err := err.(type) {
 		case *json.UnmarshalTypeError:
-			failedData := data[err.Offset-50:err.Offset+20]
+			failedData := data[err.Offset-50 : err.Offset+20]
 			fmt.Printf("JSON Error at %v\n", string(failedData))
 		}
 	}
@@ -48,7 +48,7 @@ func (c *SingularityClient) ListAllRequests() ([]models.RequestParent, error) {
 	return res, err
 }
 
-func (c *SingularityClient) requestFor(path string, a... interface{}) (*http.Request, error) {
+func (c *SingularityClient) requestFor(path string, a ...interface{}) (*http.Request, error) {
 	url := c.urlFor(api_list_requests)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -62,6 +62,6 @@ func (c *SingularityClient) requestFor(path string, a... interface{}) (*http.Req
 	return req, nil
 }
 
-func (c *SingularityClient) urlFor(path string, a... interface{}) string {
-	return fmt.Sprintf(c.baseUri + path, a...);
+func (c *SingularityClient) urlFor(path string, a ...interface{}) string {
+	return fmt.Sprintf(c.baseUri+path, a...)
 }
