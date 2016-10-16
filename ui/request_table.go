@@ -53,10 +53,12 @@ func taskToStrings(task models.SingularityTaskIdHistory) []string {
 	switch task.LastTaskState {
 	case "TASK_RUNNING":
 		state = green(task.LastTaskState)
-		break
+	case "TASK_KILLED":
+		state = red(task.LastTaskState)
+	case "TASK_LAUNCHED":
+		state = blue(task.LastTaskState)
 	default:
 		state = task.LastTaskState
-		break
 	}
 
 	humanReadableStartTime, err := time.Unix(task.TaskId.StartedAt/1000, 0).MarshalText()
@@ -82,16 +84,12 @@ func requestToStrings(req models.RequestParent) []string {
 	switch req.State {
 	case "ACTIVE":
 		state = green(req.State)
-		break
 	case "PAUSED":
 		state = blue(req.State)
-		break
 	case "SYSTEM_COOLDOWN":
 		state = red(req.State)
-		break
 	default:
 		state = req.State
-		break
 	}
 
 	return []string{req.Request.Id, state}
