@@ -75,7 +75,7 @@ func ScaleRequest(client *client.SingularityClient, requestId string, numInstanc
 	ShowRequestDetails(client, requestId)
 }
 
-func BrowseSandbox(client *client.SingularityClient, requestId string, instance int) {
+func BrowseSandbox(client *client.SingularityClient, requestId, path string, instance int) {
 	tasks, err := client.GetActiveTasksFor(requestId)
 	if err != nil {
 		fmt.Printf("Could not load tasks for request %v: %#v", requestId, err)
@@ -94,7 +94,7 @@ func BrowseSandbox(client *client.SingularityClient, requestId string, instance 
 		return
 	}
 
-	sandbox, err := client.BrowseSandbox(task.Id)
+	sandbox, err := client.BrowseSandbox(task.Id, path)
 	if err != nil {
 		fmt.Printf("Could not browse sandbox of task %v: %#v", task.Id, err)
 		panic(err)

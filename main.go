@@ -156,7 +156,7 @@ func main() {
 							return nil
 						},
 						Action: func(c *cli.Context) error {
-							commands.BrowseSandbox(conf.getClient(), c.Args().Get(0), conf.InstanceNum)
+							commands.BrowseSandbox(conf.getClient(), c.Args().Get(0), c.Args().Get(1), conf.InstanceNum)
 							return nil
 						},
 						BashComplete: completeFromCachedRequestList(&conf),

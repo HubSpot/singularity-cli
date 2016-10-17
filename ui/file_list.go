@@ -11,6 +11,7 @@ import (
 
 func RenderSandboxFileList(sandbox models.SingularitySandbox) {
 	fmt.Println(sandbox.SlaveHostname)
+	fmt.Println(sandbox.CurrentDirectory)
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeaderLine(false)
