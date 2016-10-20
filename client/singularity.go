@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"git.hubteam.com/zklapow/singularity-cli/models"
 	"io/ioutil"
 	"net/http"
@@ -30,26 +29,10 @@ func NewSingularityClient(baseUri string, headers map[string]string) *Singularit
 }
 
 func (c *SingularityClient) ListAllRequests() ([]models.RequestParent, error) {
-	req, err := c.requestFor(api_list_requests)
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	res := make([]models.RequestParent, 0)
-	err = json.Unmarshal(data, &res)
+	err := c.getJson(&res, api_list_requests)
 	if err != nil {
-		switch err := err.(type) {
-		case *json.UnmarshalTypeError:
-			failedData := data[err.Offset-50 : err.Offset+20]
-			fmt.Printf("JSON Error at %v\n", string(failedData))
-		}
+		return nil, err
 	}
 
 	// Always cache the requests after we load the whole lists
@@ -58,49 +41,15 @@ func (c *SingularityClient) ListAllRequests() ([]models.RequestParent, error) {
 	return res, err
 }
 
-func (c *SingularityClient) GetRequest(requestId string) (*models.RequestParent, error) {
-	req, err := c.requestFor(api_get_request, requestId)
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	res := &models.RequestParent{}
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return nil, err
-	}
-
+func (c *SingularityClient) GetRequest(requestId string) (models.RequestParent, error) {
+	res := models.RequestParent{}
+	err := c.getJson(&res, api_get_request, requestId)
 	return res, err
 }
 
 func (c *SingularityClient) GetActiveTasksFor(requestId string) ([]models.SingularityTaskIdHistory, error) {
-	req, err := c.requestFor(api_active_tasks_for_request, requestId)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
 	res := make([]models.SingularityTaskIdHistory, 0)
-	err = json.Unmarshal(data, &res)
-	if err != nil {
-		return nil, err
-	}
+	err := c.getJson(&res, api_active_tasks_for_request, requestId)
 
 	return res, err
 }
@@ -178,26 +127,4 @@ func (c *SingularityClient) pauseInternal(path, requestId string) (*models.Reque
 	}
 
 	return res, nil
-}
-
-func (c *SingularityClient) requestFor(path string, a ...interface{}) (*http.Request, error) {
-	url := c.urlFor(path, a...)
-	req, err := http.NewRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-
-	c.setStandardRequestsHeaders(req)
-
-	return req, nil
-}
-
-func (c *SingularityClient) setStandardRequestsHeaders(req *http.Request) {
-	for k, v := range c.headers {
-		req.Header.Add(k, v)
-	}
-}
-
-func (c *SingularityClient) urlFor(path string, a ...interface{}) string {
-	return fmt.Sprintf(c.baseUri+path, a...)
 }
