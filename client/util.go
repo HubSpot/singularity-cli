@@ -67,9 +67,12 @@ func (c *SingularityClient) urlFor(path string) *url.URL {
 func (c *SingularityClient) urlWithQueryParams(path string, queryParams map[string]string) *url.URL {
 	finalurl, _ := url.Parse(c.baseUri + path)
 
+	values := url.Values{}
 	for k, v := range queryParams {
-		finalurl.Query().Add(k, v)
+		values.Add(k, v)
 	}
+
+	finalurl.RawQuery = values.Encode()
 
 	return finalurl
 }

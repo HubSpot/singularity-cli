@@ -166,6 +166,31 @@ func main() {
 						},
 						BashComplete: completeFromCachedRequestList(&conf),
 					},
+					{
+						Flags: []cli.Flag{
+							&cli.IntFlag{
+								Name:    "instance",
+								Aliases: []string{"i"},
+								Value:   1,
+								Usage:   "Browse sandbox of `INSTANCE`",
+								Destination: &conf.InstanceNum,
+							},
+						},
+						Name:      "cat",
+						Usage:     "cat a file in this tasks sandbox",
+						ArgsUsage: "taskId [path]",
+						Before: func(c *cli.Context) error {
+							if c.Args().Get(0) == "" {
+								return errors.New("Error: Must specify a task to browse")
+							}
+							return nil
+						},
+						Action: func(c *cli.Context) error {
+							commands.CatFile(conf.getClient(), c.Args().Get(0), c.Args().Get(1), conf.InstanceNum)
+							return nil
+						},
+						BashComplete: completeFromCachedRequestList(&conf),
+					},
 				},
 			},
 		},
