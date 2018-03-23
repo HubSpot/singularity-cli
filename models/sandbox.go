@@ -15,7 +15,7 @@ type SingularitySandboxFile struct {
 }
 
 type MesosFileChunk struct {
-	NextOffset uint64 `json:"nextOffset"`
+	NextOffset int64  `json:"nextOffset"`
 	Data 	   string `json:"data"`
-	Offset     uint64 `json:"offset"`
+	Offset     int64  `json:"offset"`
 }

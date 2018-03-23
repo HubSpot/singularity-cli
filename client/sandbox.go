@@ -30,7 +30,7 @@ func (c *SingularityClient) GetFileChunk(taskId, path string) (*models.MesosFile
 	return c.GetFileChunkWithOffset(taskId, path, 0, 0)
 }
 
-func (c *SingularityClient) GetFileChunkWithOffset(taskId, path string, offset, length uint64) (*models.MesosFileChunk, error) {
+func (c *SingularityClient) GetFileChunkWithOffset(taskId, path string, offset, length int64) (*models.MesosFileChunk, error) {
 	res := &models.MesosFileChunk{}
 
 	reqPath := fmt.Sprintf(api_sandbox_read, taskId)
@@ -39,11 +39,11 @@ func (c *SingularityClient) GetFileChunkWithOffset(taskId, path string, offset, 
 	queryParams["path"] = filepath.Join(taskId, path)
 
 	if length > 0 {
-		queryParams["length"] = strconv.FormatUint(length, 10)
+		queryParams["length"] = strconv.FormatInt(length, 10)
 	}
 
 	if offset >= 0 {
-		queryParams["offset"] = strconv.FormatUint(offset, 10)
+		queryParams["offset"] = strconv.FormatInt(offset, 10)
 	}
 
 	finalurl := c.urlWithQueryParams(reqPath, queryParams)
