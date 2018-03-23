@@ -6,6 +6,7 @@ import (
 	"git.hubteam.com/zklapow/singularity-cli/models"
 	"git.hubteam.com/zklapow/singularity-cli/ui"
 	"time"
+	"path/filepath"
 )
 
 func BrowseSandbox(client *client.SingularityClient, requestId, path string, instance int) {
@@ -41,21 +42,33 @@ func CatFile(client *client.SingularityClient, requestId, path string, instance 
 		return
 	}
 
-	data := ""
-	lastOffset := int64(-1)
+	dir, name := filepath.Split(path)
+	sandbox, err := client.BrowseSandbox(task.Id, dir)
+	if err != nil {
+		fmt.Printf("Could not get directory metadata for %#v in sandbox of task %v: %#v", dir, task.Id, err)
+		panic(err)
+	}
+
+	size := uint64(0)
+	for _, file := range sandbox.Files {
+		if file.Name == name {
+			size = file.Size
+			break
+		}
+	}
+
+	lastOffset := int64(0)
 	var chunk *models.MesosFileChunk
-	for {
+	for lastOffset < int64(size) {
 		chunk, err = client.GetFileChunkWithOffset(task.Id, path, lastOffset, 10000)
 		if err != nil {
 			fmt.Printf("Could not get file %#v sandbox of task %v: %#v", path, task.Id, err)
 			panic(err)
 		}
 
-		data += chunk.Data
+		fmt.Print(chunk.Data)
 		lastOffset = chunk.Offset + int64(len(chunk.Data))
 	}
-
-	fmt.Println(data)
 }
 
 func TailFile(client *client.SingularityClient, requestId, path string, instance int) {
