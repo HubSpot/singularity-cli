@@ -7,6 +7,7 @@ import (
 	"git.hubteam.com/zklapow/singularity-cli/models"
 	"io/ioutil"
 	"net/http"
+	"fmt"
 )
 
 const (
@@ -30,7 +31,7 @@ func NewSingularityClient(baseUri string, headers map[string]string) *Singularit
 
 func (c *SingularityClient) ListAllRequests() ([]models.RequestParent, error) {
 	res := make([]models.RequestParent, 0)
-	err := c.getJson(&res, api_list_requests)
+	err := c.getJsonSimple(&res, api_list_requests)
 	if err != nil {
 		return nil, err
 	}
@@ -43,13 +44,13 @@ func (c *SingularityClient) ListAllRequests() ([]models.RequestParent, error) {
 
 func (c *SingularityClient) GetRequest(requestId string) (models.RequestParent, error) {
 	res := models.RequestParent{}
-	err := c.getJson(&res, api_get_request, requestId)
+	err := c.getJsonSimple(&res, fmt.Sprintf(api_get_request, requestId))
 	return res, err
 }
 
 func (c *SingularityClient) GetActiveTasksFor(requestId string) ([]models.SingularityTaskIdHistory, error) {
 	res := make([]models.SingularityTaskIdHistory, 0)
-	err := c.getJson(&res, api_active_tasks_for_request, requestId)
+	err := c.getJsonSimple(&res, fmt.Sprintf(api_active_tasks_for_request, requestId))
 
 	return res, err
 }
@@ -64,7 +65,7 @@ func (c *SingularityClient) ScaleRequest(requestId string, numInstances int) (*m
 		return nil, err
 	}
 
-	req, err := http.NewRequest("PUT", c.urlFor(api_scale_request, requestId), bytes.NewBuffer(data))
+	req, err := http.NewRequest("PUT", c.urlFor(fmt.Sprintf(api_scale_request, requestId)).String(), bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +105,7 @@ func (c *SingularityClient) UnPauseRequest(requestId string) (*models.RequestPar
 }
 
 func (c *SingularityClient) pauseInternal(path, requestId string) (*models.RequestParent, error) {
-	req, err := c.requestFor(path, requestId)
+	req, err := c.requestFor(c.urlFor(fmt.Sprintf(path, requestId)))
 	if err != nil {
 		return nil, err
 	}
