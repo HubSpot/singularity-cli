@@ -30,6 +30,61 @@ func main() {
 	dir, _ := homedir.Dir()
 
 	configPath := path.Join(dir, ".sng/config.toml")
+
+	tailCommand := &cli.Command{
+		Flags: []cli.Flag{
+			&cli.IntFlag{
+				Name:        "instance",
+				Aliases:     []string{"i"},
+				Value:       1,
+				Usage:       "Browse sandbox of `INSTANCE`",
+				Destination: &conf.InstanceNum,
+			},
+		},
+		Name:      "tail",
+		Usage:     "tail a file in this tasks sandbox",
+		ArgsUsage: "taskId [path]",
+		Category:  "files",
+		Before: func(c *cli.Context) error {
+			if c.Args().Get(0) == "" {
+				return errors.New("Error: Must specify a task to browse")
+			}
+			return nil
+		},
+		Action: func(c *cli.Context) error {
+			commands.TailFile(conf.getClient(), c.Args().Get(0), c.Args().Get(1), conf.InstanceNum)
+			return nil
+		},
+		BashComplete: completeFromCachedRequestList(&conf),
+	}
+
+	catCommand := &cli.Command{
+		Flags: []cli.Flag{
+			&cli.IntFlag{
+				Name:        "instance",
+				Aliases:     []string{"i"},
+				Value:       1,
+				Usage:       "Browse sandbox of `INSTANCE`",
+				Destination: &conf.InstanceNum,
+			},
+		},
+		Name:      "cat",
+		Usage:     "cat a file in this tasks sandbox",
+		ArgsUsage: "taskId [path]",
+		Category:  "files",
+		Before: func(c *cli.Context) error {
+			if c.Args().Get(0) == "" {
+				return errors.New("Error: Must specify a task to browse")
+			}
+			return nil
+		},
+		Action: func(c *cli.Context) error {
+			commands.CatFile(conf.getClient(), c.Args().Get(0), c.Args().Get(1), conf.InstanceNum)
+			return nil
+		},
+		BashComplete: completeFromCachedRequestList(&conf),
+	}
+
 	app := &cli.App{
 		EnableBashCompletion: true,
 		Before: altsrc.InitInputSourceWithContext(flags, func(context *cli.Context) (altsrc.InputSourceContext, error) {
@@ -132,6 +187,8 @@ func main() {
 				},
 				BashComplete: completeFromCachedRequestList(&conf),
 			},
+			catCommand,
+			tailCommand,
 			{
 				Category:  "files",
 				Name:      "files",
@@ -144,10 +201,10 @@ func main() {
 					{
 						Flags: []cli.Flag{
 							&cli.IntFlag{
-								Name:    "instance",
-								Aliases: []string{"i"},
-								Value:   1,
-								Usage:   "Browse sandbox of `INSTANCE`",
+								Name:        "instance",
+								Aliases:     []string{"i"},
+								Value:       1,
+								Usage:       "Browse sandbox of `INSTANCE`",
 								Destination: &conf.InstanceNum,
 							},
 						},
@@ -166,6 +223,8 @@ func main() {
 						},
 						BashComplete: completeFromCachedRequestList(&conf),
 					},
+					catCommand,
+					tailCommand,
 				},
 			},
 		},

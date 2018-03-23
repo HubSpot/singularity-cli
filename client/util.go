@@ -5,10 +5,20 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 )
 
-func (c *SingularityClient) getJson(result interface{}, path string, args ...interface{}) error {
-	req, err := c.requestFor(path, args...)
+func (c *SingularityClient) getJsonSimple(result interface{}, reqPath string, args ...interface{}) error {
+	finalReqUrl, err := url.Parse(c.baseUri + reqPath)
+	if err != nil {
+		return err
+	}
+
+	return c.getJson(result, finalReqUrl)
+}
+
+func (c *SingularityClient) getJson(result interface{}, reqUrl *url.URL) error {
+	req, err := c.requestFor(reqUrl)
 	if err != nil {
 		return err
 	}
@@ -33,9 +43,8 @@ func (c *SingularityClient) getJson(result interface{}, path string, args ...int
 	return err
 }
 
-func (c *SingularityClient) requestFor(path string, a ...interface{}) (*http.Request, error) {
-	url := c.urlFor(path, a...)
-	req, err := http.NewRequest("GET", url, nil)
+func (c *SingularityClient) requestFor(reqUrl *url.URL) (*http.Request, error) {
+	req, err := http.NewRequest("GET", reqUrl.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +60,19 @@ func (c *SingularityClient) setStandardRequestsHeaders(req *http.Request) {
 	}
 }
 
-func (c *SingularityClient) urlFor(path string, a ...interface{}) string {
-	return fmt.Sprintf(c.baseUri+path, a...)
+func (c *SingularityClient) urlFor(path string) *url.URL {
+	return c.urlWithQueryParams(path, map[string]string{})
+}
+
+func (c *SingularityClient) urlWithQueryParams(path string, queryParams map[string]string) *url.URL {
+	finalurl, _ := url.Parse(c.baseUri + path)
+
+	values := url.Values{}
+	for k, v := range queryParams {
+		values.Add(k, v)
+	}
+
+	finalurl.RawQuery = values.Encode()
+
+	return finalurl
 }
