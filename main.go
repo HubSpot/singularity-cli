@@ -9,6 +9,8 @@ import (
 	"gopkg.in/urfave/cli.v2/altsrc"
 	"os"
 	"strconv"
+	"github.com/mitchellh/go-homedir"
+	"path"
 )
 
 func main() {
@@ -25,10 +27,13 @@ func main() {
 		}),
 	}
 
+	dir, _ := homedir.Dir()
+
+	configPath := path.Join(dir, ".sng/config.toml")
 	app := &cli.App{
 		EnableBashCompletion: true,
 		Before: altsrc.InitInputSourceWithContext(flags, func(context *cli.Context) (altsrc.InputSourceContext, error) {
-			source, err := altsrc.NewTomlSourceFromFile("/Users/zklapow/.sng/config.toml")
+			source, err := altsrc.NewTomlSourceFromFile(configPath)
 			if err != nil {
 				fmt.Printf("Failed to load config from file %#v", err)
 			}

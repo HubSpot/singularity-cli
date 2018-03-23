@@ -25,7 +25,7 @@ func FindRequestsMatching(client *client.SingularityClient, query string) {
 		panic(err)
 	}
 
-	suggested := []models.RequestParent{}
+	var suggested []models.RequestParent
 	for _, req := range reqs {
 		if strings.Contains(req.Request.Id, query) {
 			suggested = append(suggested, req)
