@@ -86,6 +86,7 @@ func main() {
 	}
 
 	app := &cli.App{
+		Version: "0.2.0",
 		EnableBashCompletion: true,
 		Before: altsrc.InitInputSourceWithContext(flags, func(context *cli.Context) (altsrc.InputSourceContext, error) {
 			source, err := altsrc.NewTomlSourceFromFile(configPath)
