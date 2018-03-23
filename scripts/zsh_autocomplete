@@ -1,4 +1,4 @@
-#compdef singularity-cli 
+#compdef sng
 
 script_dir=${0:a:h}
 

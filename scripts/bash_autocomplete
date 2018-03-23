@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROG=singularity-cli
+PROG=sng
 
 : ${PROG:=$(basename ${BASH_SOURCE})}
 
