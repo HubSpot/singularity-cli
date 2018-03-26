@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"github.com/mitchellh/go-homedir"
 	"path"
+	"os/user"
 )
 
 const VERSION = "0.2.1"
@@ -32,6 +33,10 @@ func main() {
 	dir, _ := homedir.Dir()
 
 	configPath := path.Join(dir, ".sng/config.toml")
+
+	if err := createDefaultConfig(configPath); err != nil {
+		panic(err)
+	}
 
 	tailCommand := &cli.Command{
 		Flags: []cli.Flag{
@@ -259,4 +264,26 @@ func completeFromCachedRequestList(conf *Config) cli.BashCompleteFunc {
 
 		return
 	}
+}
+
+func createDefaultConfig(configPath string) error {
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		user, err := user.Current()
+		if err != nil {
+			return err
+		}
+
+		outConfig := fmt.Sprintf(CONFIG_TEMPLATE, user.Username)
+		f, err := os.Create(configPath)
+		if err != nil {
+			return err
+		}
+
+		defer f.Close()
+
+		f.WriteString(outConfig)
+		f.Sync()
+	}
+
+	return nil
 }
