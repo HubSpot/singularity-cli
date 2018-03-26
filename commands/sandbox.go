@@ -7,6 +7,7 @@ import (
 	"git.hubteam.com/zklapow/singularity-cli/ui"
 	"time"
 	"path/filepath"
+	"sync"
 )
 
 func BrowseSandbox(client *client.SingularityClient, requestId, path string, instance int) {
@@ -72,6 +73,11 @@ func CatFile(client *client.SingularityClient, requestId, path string, instance 
 }
 
 func TailFile(client *client.SingularityClient, requestId, path string, instance int) {
+	if instance <= 0 {
+		TailAll(client, requestId, path)
+		return
+	}
+
 	task, err := taskForRequest(client, requestId, instance)
 	if err != nil {
 		fmt.Printf("Could not load tasks for request %v: %#v", requestId, err)
@@ -83,12 +89,38 @@ func TailFile(client *client.SingularityClient, requestId, path string, instance
 		return
 	}
 
+	tailSingle(client, path, task.Id)
+}
+
+func TailAll(client *client.SingularityClient, requestId, path string) error {
+	tasks, err := client.GetActiveTasksFor(requestId)
+	if err != nil {
+		fmt.Printf("Could not load tasks for request %v: %#v", requestId, err)
+		return err
+	}
+
+	var wg sync.WaitGroup
+	for i, _ := range tasks {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			tailSingle(client, path, tasks[i].TaskId.Id)
+		}()
+	}
+
+	wg.Wait()
+
+	return nil
+}
+
+func tailSingle(client *client.SingularityClient, path, taskId string) {
 	lastOffset := int64(-1)
 	var chunk *models.MesosFileChunk
+	var err error
 	for {
-		chunk, err = client.GetFileChunkWithOffset(task.Id, path, lastOffset, 10000)
+		chunk, err = client.GetFileChunkWithOffset(taskId, path, lastOffset, 10000)
 		if err != nil {
-			fmt.Printf("Could not get file %#v sandbox of task %v: %#v", path, task.Id, err)
+			fmt.Printf("Could not get file %#v sandbox of task %v: %#v", path, taskId, err)
 			panic(err)
 		}
 

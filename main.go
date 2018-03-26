@@ -36,7 +36,7 @@ func main() {
 			&cli.IntFlag{
 				Name:        "instance",
 				Aliases:     []string{"i"},
-				Value:       1,
+				Value:       -1,
 				Usage:       "Browse sandbox of `INSTANCE`",
 				Destination: &conf.InstanceNum,
 			},
