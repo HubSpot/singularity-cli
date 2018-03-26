@@ -14,7 +14,7 @@ import (
 	"os/user"
 )
 
-const VERSION = "0.2.1"
+const VERSION = "0.2.2"
 
 func main() {
 	conf := Config{}
