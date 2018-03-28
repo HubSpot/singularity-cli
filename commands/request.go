@@ -32,6 +32,11 @@ func FindRequestsMatching(client *client.SingularityClient, query string) {
 		}
 	}
 
+	if len(suggested) == 1 {
+		ShowRequestDetails(client, suggested[0].Request.Id)
+		return
+	}
+
 	ui.RenderRequestTable(suggested)
 }
 

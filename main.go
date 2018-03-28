@@ -14,7 +14,7 @@ import (
 	"os/user"
 )
 
-const VERSION = "0.2.2"
+const VERSION = "0.2.3"
 
 func main() {
 	conf := Config{}
@@ -36,6 +36,32 @@ func main() {
 
 	if err := createDefaultConfig(configPath); err != nil {
 		panic(err)
+	}
+
+	lsCommand := &cli.Command{
+		Flags: []cli.Flag{
+			&cli.IntFlag{
+				Name:        "instance",
+				Aliases:     []string{"i"},
+				Value:       1,
+				Usage:       "Browse sandbox of `INSTANCE`",
+				Destination: &conf.InstanceNum,
+			},
+		},
+		Name:      "ls",
+		Usage:     "List files in this tasks sandbox",
+		ArgsUsage: "taskId [path]",
+		Before: func(c *cli.Context) error {
+			if c.Args().Get(0) == "" {
+				return errors.New("Error: Must specify a task to browse")
+			}
+			return nil
+		},
+		Action: func(c *cli.Context) error {
+			commands.BrowseSandbox(conf.getClient(), c.Args().Get(0), c.Args().Get(1), conf.InstanceNum)
+			return nil
+		},
+		BashComplete: completeFromCachedRequestList(&conf),
 	}
 
 	tailCommand := &cli.Command{
@@ -93,7 +119,7 @@ func main() {
 	}
 
 	app := &cli.App{
-		Version: VERSION,
+		Version:              VERSION,
 		EnableBashCompletion: true,
 		Before: altsrc.InitInputSourceWithContext(flags, func(context *cli.Context) (altsrc.InputSourceContext, error) {
 			source, err := altsrc.NewTomlSourceFromFile(configPath)
@@ -109,9 +135,8 @@ func main() {
 		Commands: []*cli.Command{
 			{
 				Category:  "requests",
-				Name:      "list",
-				Aliases:   []string{"ls"},
-				Usage:     "list all requests",
+				Name:      "show",
+				Usage:     "show all requests",
 				ArgsUsage: "[request]",
 				Action: func(c *cli.Context) error {
 					if c.Args().Get(0) != "" {
@@ -195,6 +220,7 @@ func main() {
 				},
 				BashComplete: completeFromCachedRequestList(&conf),
 			},
+			lsCommand,
 			catCommand,
 			tailCommand,
 			{
@@ -206,31 +232,7 @@ func main() {
 					fmt.Println("ls")
 				},
 				Subcommands: []*cli.Command{
-					{
-						Flags: []cli.Flag{
-							&cli.IntFlag{
-								Name:        "instance",
-								Aliases:     []string{"i"},
-								Value:       1,
-								Usage:       "Browse sandbox of `INSTANCE`",
-								Destination: &conf.InstanceNum,
-							},
-						},
-						Name:      "ls",
-						Usage:     "List files in this tasks sandbox",
-						ArgsUsage: "taskId [path]",
-						Before: func(c *cli.Context) error {
-							if c.Args().Get(0) == "" {
-								return errors.New("Error: Must specify a task to browse")
-							}
-							return nil
-						},
-						Action: func(c *cli.Context) error {
-							commands.BrowseSandbox(conf.getClient(), c.Args().Get(0), c.Args().Get(1), conf.InstanceNum)
-							return nil
-						},
-						BashComplete: completeFromCachedRequestList(&conf),
-					},
+					lsCommand,
 					catCommand,
 					tailCommand,
 				},
