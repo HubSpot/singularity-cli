@@ -136,7 +136,7 @@ func main() {
 			{
 				Category:  "requests",
 				Name:      "show",
-				Usage:     "show all requests",
+				Usage:     "show requests details",
 				ArgsUsage: "[request]",
 				Action: func(c *cli.Context) error {
 					if c.Args().Get(0) != "" {
@@ -145,17 +145,6 @@ func main() {
 					}
 
 					commands.ListAllRequests(conf.getClient())
-					return nil
-				},
-				BashComplete: completeFromCachedRequestList(&conf),
-			},
-			{
-				Category:  "requests",
-				Name:      "show",
-				Usage:     "show details of a request",
-				ArgsUsage: "[request]",
-				Action: func(c *cli.Context) error {
-					commands.ShowRequestDetails(conf.getClient(), c.Args().Get(0))
 					return nil
 				},
 				BashComplete: completeFromCachedRequestList(&conf),
